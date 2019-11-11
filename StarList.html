@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<style>
+    body {
+        background-color: #00004d;
+    }
+    * {
+      box-sizing: border-box;
+    }
+
+    /* Create two equal columns that floats next to each other */
+    .star-item {
+      float: left;
+      width: 100%;
+      height: 200px;
+      padding: 10px;
+      border: solid 1px black;
+    }
+    #paging {
+    	width: 100%;
+    	padding: 12px 16px;
+    	background-color: #cccccc;
+    	text-align: center;
+    }
+    .page {
+    	width: 100%;
+    	border: none;
+        outline: none;
+        padding: 12px 16px;
+        background-color: #f1f1f1;
+        cursor: pointer;
+        color: black;
+        text-decoration: none;
+    }
+    .page:hover {
+      background-color: #ddd;
+    }
+
+    .page.clicked {
+      background-color: #666;
+      color: white;
+    }    
+    /* Clear floats after the columns */
+    .row {
+      content: "";
+      display: table;
+      clear: both;
+    }
+    /* Style the buttons */
+    .btn {
+      border: none;
+      outline: none;
+      padding: 12px 16px;
+      background-color: #f1f1f1;
+      cursor: pointer;
+    }
+
+    .btn:hover {
+      background-color: #ddd;
+    }
+
+    .btn.active {
+      background-color: #666;
+      color: white;
+    }    
+    select {float: right;
+            width: 50%;}
+    section {
+        width: 100%;
+        background-color: #cccccc;
+    }
+    #edit-input-scuti, #edit-input-woh, #edit-input-hr, #edit-input-rsgc1, #edit-input-hd, #edit-input-canis, #edit-input-cygni, #edit-input-persei, #edit-input-cephei, #edit-input-vv {
+    	display: none;
+    }
+
+</style>
+</head>
+<body>
+
+<section id="btnContainer">
+  <button class="btn active" onclick="listView()"><i class="fa fa-bars"></i> List</button>
+  <button class="btn" onclick="gridView()"><i class="fa fa-th-large"></i> Grid</button>
+</section>
+      
+<br>
+
+<section id="filter"><button onclick="sortFunction()"> Sort by:</button>
+<select>
+  <option id="alphabet">alphabetically</option>
+  <option id="fromheavier">from heavier</option>
+  <option id="fromlighter">from lighter</option>
+  <option id="frombigger">from bigger</option>
+  <option id="fromsmaller">from smaller</option>
+</select>
+</section>
+
+
+<section class="row" id="stars"></section>
+
+<section id="paging">
+<a class="page clicked" onclick="prevPage()" id="btn_prev">1</a>
+<a class="page" onclick="nextPage()" id="btn_next">2</a>
+</section>
+
+<section>
+    <h3>Heavier then:</h3>
+    <button onclick="myFunctionMass()">Search</button>
+    <input id="massofstar" type="number">
+    <p id="starmass"></p>
+    <h3>Bigger then:</h3>
+    <button onclick="myFunctionSize()">Search</button>
+    <input id="sizeofstar" type="number">
+    <p id="starsize"></p>
+</section>
+
+</body>
+<script type="text/javascript">
+
+ 
+//Data
+
+
+var starrows = [{
+    name: "UY Scuti",
+    mass: 10,
+    diameter: 1708,
+    editmass: '<button onclick="editUYScuti()">EDIT</button><section id="edit-input-scuti"> <input id="massofscuti" type="number" placeholder="new mass"><input id="sizeofscuti" type="number" placeholder="new diameter"> <button onclick="newValueScuti()">Save</button> </section>'
+}, {
+    name: "WOH G64",
+    mass: 25,
+    diameter: 1540,
+    editmass: '<button onclick="editWoh()">EDIT</button><section id="edit-input-woh"> <input id="massofwoh" type="number" placeholder="new mass"><input id="sizeofwoh" type="number" placeholder="new diameter"> <button onclick="newValueWoh()">Save</button> </section>'
+}, {
+    name: "HR 5171 A",
+    mass: 36,
+    diameter: 1315,
+    editmass: '<button onclick="editHr()">EDIT</button><section id="edit-input-hr"> <input id="massofhr" type="number" placeholder="new mass"><input id="sizeofhr" type="number" placeholder="new diameter"> <button onclick="newValueHr()">Save</button> </section>'
+}, {
+    name: "RSGC1-F02",
+    mass: 30000,
+    diameter: 1498,
+    editmass: '<button onclick="editRSGC1()">EDIT</button><section id="edit-input-rsgc1"> <input id="massofrsgc1" type="number" placeholder="new mass"><input id="sizeofrsgc1" type="number" placeholder="new diameter"> <button onclick="newValueRSGC1()">Save</button> </section>'
+}, {
+    name: "HD 143183",
+    mass: 20,
+    diameter: 1469,
+    editmass: '<button onclick="editHd()">EDIT</button><section id="edit-input-hd"> <input id="massofhd" type="number" placeholder="new mass"><input id="sizeofhd" type="number" placeholder="new diameter"> <button onclick="newValueHd()">Save</button> </section>'
+}, {
+    name: "VY Canis Majoris",
+    mass: 25,
+    diameter: 1420,
+    editmass: '<button onclick="editCanis()">EDIT</button><section id="edit-input-canis"> <input id="massofcanis" type="number" placeholder="new mass"><input id="sizeofcanis" type="number" placeholder="new diameter"> <button onclick="newValueCanis()">Save</button> </section>'
+}, {
+    name: "KY Cygni",
+    mass: 25,
+    diameter: 1420,
+    editmass: '<button onclick="editCygni()">EDIT</button><section id="edit-input-cygni"> <input id="massofcygni" type="number" placeholder="new mass"><input id="sizeofcygni" type="number" placeholder="new diameter"> <button onclick="newValueCygni()">Save</button> </section>'
+}, {
+    name: "S Persei",
+    mass: 20,
+    diameter: 1212,
+    editmass: '<button onclick="editPersei()">EDIT</button><section id="edit-input-persei"> <input id="massofpersei" type="number" placeholder="new mass"><input id="sizeofpersei" type="number" placeholder="new diameter"> <button onclick="newValuePersei()">Save</button> </section>'
+}, {
+    name: "Mu Cephei",
+    mass: 19,
+    diameter: 1260,
+    editmass: '<button onclick="editCephei()">EDIT</button><section id="edit-input-cephei"> <input id="massofcephei" type="number" placeholder="new mass"><input id="sizeofcephei" type="number" placeholder="new diameter"> <button onclick="newValueCephei()">Save</button> </section>'
+}, {
+    name: "VV Cephei A",
+    mass: 28,
+    diameter: 1400,
+    editmass: '<button onclick="editVV()">EDIT</button><section id="edit-input-vv"> <input id="massofvv" type="number" placeholder="new mass"><input id="sizeofvv" type="number" placeholder="new diameter"> <button onclick="newValueVV()">Save</button> </section>'
+}];
+
+//EDIT STUFF (skraćivanje kôda bi mi uzelo više vremena, a ovako je samo bilo c/p)
+function newValueScuti () {
+var newmass = document.getElementById("massofscuti");
+var newdiameter = document.getElementById("sizeofscuti");
+objIndex = starrows.findIndex((obj => obj.name == "UY Scuti"));
+if (newmass.value == "") {
+starrows[objIndex].mass = starrows[objIndex].mass;	
+} else {
+starrows[objIndex].mass = newmass.value;}
+objIndex = starrows.findIndex((obj => obj.name == "UY Scuti"));
+if (newdiameter.value == "") {
+starrows[objIndex].diameter = starrows[objIndex].diameter;	
+} else {
+starrows[objIndex].diameter = newdiameter.value;}
+displayStars(current_page);
+}
+
+
+function editUYScuti() {
+  var showedit = document.getElementById("edit-input-scuti");
+  if (showedit.style.display === "block") {
+    showedit.style.display = "none";
+  } else {
+    showedit.style.display = "block";
+  }
+}
+
+function newValueWoh () {
+var newmass = document.getElementById("massofwoh");
+var newdiameter = document.getElementById("sizeofwoh");
+objIndex = starrows.findIndex((obj => obj.name == "WOH G64"));
+if (newmass.value == "") {
+starrows[objIndex].mass = starrows[objIndex].mass;	
+} else {
+starrows[objIndex].mass = newmass.value;}
+objIndex = starrows.findIndex((obj => obj.name == "WOH G64"));
+if (newdiameter.value == "") {
+starrows[objIndex].diameter = starrows[objIndex].diameter;	
+} else {
+starrows[objIndex].diameter = newdiameter.value;}
+displayStars(current_page);
+}
+
+
+function editWoh() {
+  var showedit = document.getElementById("edit-input-woh");
+  if (showedit.style.display === "block") {
+    showedit.style.display = "none";
+  } else {
+    showedit.style.display = "block";
+  }
+}
+
+function newValueHr () {
+var newmass = document.getElementById("massofhr");
+var newdiameter = document.getElementById("sizeofhr");
+objIndex = starrows.findIndex((obj => obj.name == "HR 5171 A"));
+if (newmass.value == "") {
+starrows[objIndex].mass = starrows[objIndex].mass;	
+} else {
+starrows[objIndex].mass = newmass.value;}
+objIndex = starrows.findIndex((obj => obj.name == "HR 5171 A"));
+if (newdiameter.value == "") {
+starrows[objIndex].diameter = starrows[objIndex].diameter;	
+} else {
+starrows[objIndex].diameter = newdiameter.value;}
+displayStars(current_page);
+}
+
+
+function editHr() {
+  var showedit = document.getElementById("edit-input-hr");
+  if (showedit.style.display === "block") {
+    showedit.style.display = "none";
+  } else {
+    showedit.style.display = "block";
+  }
+}
+
+function newValueRSGC1 () {
+var newmass = document.getElementById("massofrsgc1");
+var newdiameter = document.getElementById("sizeofrsgc1");
+objIndex = starrows.findIndex((obj => obj.name == "RSGC1-F02"));
+if (newmass.value == "") {
+starrows[objIndex].mass = starrows[objIndex].mass;	
+} else {
+starrows[objIndex].mass = newmass.value;}
+objIndex = starrows.findIndex((obj => obj.name == "RSGC1-F02"));
+if (newdiameter.value == "") {
+starrows[objIndex].diameter = starrows[objIndex].diameter;	
+} else {
+starrows[objIndex].diameter = newdiameter.value;}
+displayStars(current_page);
+}
+
+
+function editRSGC1() {
+  var showedit = document.getElementById("edit-input-rsgc1");
+  if (showedit.style.display === "block") {
+    showedit.style.display = "none";
+  } else {
+    showedit.style.display = "block";
+  }
+}
+
+function newValueHd () {
+var newmass = document.getElementById("massofhd");
+var newdiameter = document.getElementById("sizeofhd");
+objIndex = starrows.findIndex((obj => obj.name == "HD 143183"));
+if (newmass.value == "") {
+starrows[objIndex].mass = starrows[objIndex].mass;	
+} else {
+starrows[objIndex].mass = newmass.value;}
+objIndex = starrows.findIndex((obj => obj.name == "HD 143183"));
+if (newdiameter.value == "") {
+starrows[objIndex].diameter = starrows[objIndex].diameter;	
+} else {
+starrows[objIndex].diameter = newdiameter.value;}
+displayStars(current_page);
+}
+
+
+function editHd() {
+  var showedit = document.getElementById("edit-input-hd");
+  if (showedit.style.display === "block") {
+    showedit.style.display = "none";
+  } else {
+    showedit.style.display = "block";
+  }
+}
+
+function newValueCanis () {
+var newmass = document.getElementById("massofcanis");
+var newdiameter = document.getElementById("sizeofcanis");
+objIndex = starrows.findIndex((obj => obj.name == "VY Canis Majoris"));
+if (newmass.value == "") {
+starrows[objIndex].mass = starrows[objIndex].mass;	
+} else {
+starrows[objIndex].mass = newmass.value;}
+objIndex = starrows.findIndex((obj => obj.name == "VY Canis Majoris"));
+if (newdiameter.value == "") {
+starrows[objIndex].diameter = starrows[objIndex].diameter;	
+} else {
+starrows[objIndex].diameter = newdiameter.value;}
+displayStars(current_page);
+}
+
+
+function editCanis() {
+  var showedit = document.getElementById("edit-input-canis");
+  if (showedit.style.display === "block") {
+    showedit.style.display = "none";
+  } else {
+    showedit.style.display = "block";
+  }
+}
+
+function newValueCygni () {
+var newmass = document.getElementById("massofcygni");
+var newdiameter = document.getElementById("sizeofcygni");
+objIndex = starrows.findIndex((obj => obj.name == "KY Cygni"));
+if (newmass.value == "") {
+starrows[objIndex].mass = starrows[objIndex].mass;	
+} else {
+starrows[objIndex].mass = newmass.value;}
+objIndex = starrows.findIndex((obj => obj.name == "KY Cygni"));
+if (newdiameter.value == "") {
+starrows[objIndex].diameter = starrows[objIndex].diameter;	
+} else {
+starrows[objIndex].diameter = newdiameter.value;}
+displayStars(current_page);
+}
+
+
+function editCygni() {
+  var showedit = document.getElementById("edit-input-cygni");
+  if (showedit.style.display === "block") {
+    showedit.style.display = "none";
+  } else {
+    showedit.style.display = "block";
+  }
+}
+
+function newValuePersei () {
+var newmass = document.getElementById("massofpersei");
+var newdiameter = document.getElementById("sizeofpersei");
+objIndex = starrows.findIndex((obj => obj.name == "S Persei"));
+if (newmass.value == "") {
+starrows[objIndex].mass = starrows[objIndex].mass;	
+} else {
+starrows[objIndex].mass = newmass.value;}
+objIndex = starrows.findIndex((obj => obj.name == "S Persei"));
+if (newdiameter.value == "") {
+starrows[objIndex].diameter = starrows[objIndex].diameter;	
+} else {
+starrows[objIndex].diameter = newdiameter.value;}
+displayStars(current_page);
+}
+
+
+function editPersei() {
+  var showedit = document.getElementById("edit-input-persei");
+  if (showedit.style.display === "block") {
+    showedit.style.display = "none";
+  } else {
+    showedit.style.display = "block";
+  }
+}
+
+function newValueCephei () {
+var newmass = document.getElementById("massofcephei");
+var newdiameter = document.getElementById("sizeofcephei");
+objIndex = starrows.findIndex((obj => obj.name == "Mu Cephei"));
+if (newmass.value == "") {
+starrows[objIndex].mass = starrows[objIndex].mass;	
+} else {
+starrows[objIndex].mass = newmass.value;}
+objIndex = starrows.findIndex((obj => obj.name == "Mu Cephei"));
+if (newdiameter.value == "") {
+starrows[objIndex].diameter = starrows[objIndex].diameter;	
+} else {
+starrows[objIndex].diameter = newdiameter.value;}
+displayStars(current_page);
+}
+
+
+function editCephei() {
+  var showedit = document.getElementById("edit-input-cephei");
+  if (showedit.style.display === "block") {
+    showedit.style.display = "none";
+  } else {
+    showedit.style.display = "block";
+  }
+}
+
+function newValueVV () {
+var newmass = document.getElementById("massofvv");
+var newdiameter = document.getElementById("sizeofvv");
+objIndex = starrows.findIndex((obj => obj.name == "VV Cephei A"));
+if (newmass.value == "") {
+starrows[objIndex].mass = starrows[objIndex].mass;	
+} else {
+starrows[objIndex].mass = newmass.value;}
+objIndex = starrows.findIndex((obj => obj.name == "VV Cephei A"));
+if (newdiameter.value == "") {
+starrows[objIndex].diameter = starrows[objIndex].diameter;	
+} else {
+starrows[objIndex].diameter = newdiameter.value;}
+displayStars(current_page);
+}
+
+
+function editVV() {
+  var showedit = document.getElementById("edit-input-vv");
+  if (showedit.style.display === "block") {
+    showedit.style.display = "none";
+  } else {
+    showedit.style.display = "block";
+  }
+}
+
+
+// Sort Stars
+function sortFunction(d)
+            {
+            if (fromlighter.selected == true) {
+  starrows.sort(function(a, b){return a.mass - b.mass});
+  displayStars(current_page);
+            } else if (fromheavier.selected == true) {
+    starrows.sort(function(a, b){return b.mass - a.mass});
+    displayStars(current_page);
+            } else if (fromsmaller.selected == true) {
+    starrows.sort(function(a, b){return a.diameter - b.diameter});
+    displayStars(current_page);
+            } else if (frombigger.selected == true) {
+    starrows.sort(function(a, b){return b.diameter - a.diameter});
+    displayStars(current_page);
+            } else if (alphabet.selected == true) {
+  starrows.sort(function(a, b){
+    var namex = a.name.toLowerCase();
+    var namey = b.name.toLowerCase();
+    if (namex < namey) {return -1;}
+    if (namex > namey) {return 1;}
+    return 0;
+  });displayStars(current_page);
+        }
+
+    }
+
+
+var current_page = 1;
+var records_per_page = 5;
+
+
+function prevPage()
+{
+    if (current_page > 1) {
+        current_page--;
+        displayStars(current_page);
+    }
+}
+
+function nextPage()
+{
+    if (current_page < numPages()) {
+        current_page++;
+        displayStars(current_page);
+    }
+}
+//Display Stars
+function displayStars(page) {
+
+    var listing_table = document.getElementById("stars");
+ 
+    // Validate page
+    if (page < 1) page = 1;
+    if (page > numPages()) page = numPages();
+
+    listing_table.innerHTML = "";
+
+  for (var i = (page-1) * records_per_page; i < (page * records_per_page); i++) {
+        listing_table.innerHTML +=
+  '<div class="star-item">' + "<h3>" + starrows[i].name + "</h3>" + "<p> Mass:" + starrows[i].mass + "</p>" + "<p>Size:" + starrows[i].diameter + "</p>" + "<p>" + starrows[i].editmass + "</p>" + '</div>';
+}
+}
+
+function numPages()
+{
+    return Math.ceil(starrows.length / records_per_page);
+}
+
+window.onload = function() {
+    displayStars(1);
+};
+
+// List / Grid view
+var elements = document.getElementsByClassName("star-item");
+
+var i;
+
+// List View
+function listView() {
+  for (i = 0; i < elements.length; i++) {
+    elements[i].style.width = "100%"
+  }
+}
+
+// Grid View
+function gridView() {
+  for (i = 0; i < elements.length; i++) {
+    elements[i].style.width = "50%"
+  }
+}
+
+var container = document.getElementById("btnContainer");
+var btns = container.getElementsByClassName("btn");
+for (var i = 0; i < btns.length; i++) {
+  btns[i].addEventListener("click", function() {
+    var current = document.getElementsByClassName("active");
+    current[0].className = current[0].className.replace(" active", "");
+    this.className += " active";
+  });
+}
+
+var btnspage = document.getElementsByClassName("page");
+for (var i = 0; i < btnspage.length; i++) {
+  btnspage[i].addEventListener("click", function() {
+    var current = document.getElementsByClassName("clicked");
+    current[0].className = current[0].className.replace(" clicked", "");
+    this.className += " clicked";
+  });
+}
+//Mass Filter
+var starmass = document.getElementById("massofstar");
+
+function massfilter(starrows) {
+    return starrows.mass > starmass.value;
+}
+
+
+
+function myFunctionMass() {
+let starsmass = starrows.filter(massfilter);
+
+document.getElementById("starmass").innerHTML = starsmass.map(s => s.name + " " + s.mass + "sm").join(", ");
+}
+
+//Size Filter
+var starsize = document.getElementById("sizeofstar");
+
+function sizefilter(starrows) {
+    return starrows.diameter > starsize.value;
+}
+
+
+
+function myFunctionSize() {
+let starssize = starrows.filter(sizefilter);
+
+document.getElementById("starsize").innerHTML = starssize.map(s => s.name + " " + s.diameter + "sr").join(", ");
+}
+
+
+
+
+</script>
+</html>
+
+
